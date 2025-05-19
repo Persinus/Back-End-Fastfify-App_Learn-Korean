@@ -11,49 +11,19 @@ const jwt = require("@fastify/jwt");
 const fastifyStatic = require("@fastify/static");
 
 // Đăng ký Swagger + Swagger UI
-fastify.register(swagger, {
-  swagger: {
+fastify.register(require('@fastify/swagger'), {
+  mode: 'dynamic',
+  openapi: {
+    openapi: '3.0.3',
     info: {
-      title: "My API",
-      description: "Testing the Fastify swagger integration",
-      version: "1.0.0",
-    },
-    consumes: ["application/json"],
-    produces: ["application/json"],
-  },
+      title: 'My API',
+      description: 'Testing the Fastify OpenAPI integration',
+      version: '1.0.0'
+    }
+  }
 });
-
-fastify.register(swaggerUI, {
-  routePrefix: "/documentation",
-  uiConfig: {
-    docExpansion: "none",
-    deepLinking: true,
-    displayRequestDuration: true,
-    filter: true,
-    defaultModelsExpandDepth: -1,
-    showExtensions: true,
-    showCommonExtensions: true,
-  },
-  uiHooks: {
-    onRequest: (request, reply, next) => {
-      next();
-    },
-    preHandler: (request, reply, next) => {
-      next();
-    },
-  },
-  staticCSP: true,
-  swaggerUIOptions: {
-    customCss: `
-      .swagger-ui .topbar { background-color: #1e40af; }
-      .swagger-ui .info { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-      .swagger-ui .scheme-container { background-color: #e0f2fe; }
-      .swagger-ui .opblock { border-radius: 10px; box-shadow: 0 0 10px rgba(30, 64, 175, 0.5); }
-    `,
-    customSiteTitle: "My Awesome API Docs",
-    customfavIcon: "https://cdn-icons-png.flaticon.com/128/6422/6422199.png",
-  },
-  transformStaticCSP: (header) => header,
+fastify.register(require('@fastify/swagger-ui'), {
+  routePrefix: '/documentation'
 });
 
 // Các plugin khác
@@ -368,8 +338,7 @@ fastify.get("/spotlight", async (request, reply) => {
             apiDescriptionUrl="/documentation/json"
             router="hash"
             layout="sidebar"
-            hideExport="true"
-            hideTryIt="false"
+           
           />
         </div>
         <div class="toast" id="toast">API request sent successfully!</div>
@@ -845,7 +814,13 @@ fastify.get("/feedback/admin", async (request, reply) => {
 });
 
 // Đăng ký các route riêng
-fastify.register(require("./routes/User"), { prefix: "/auth" });
+fastify.register(require("./routes/User"), { prefix: "/User" });
+fastify.register(require('./routes/freeCourse'), { prefix: "/freeCourse" });
+fastify.register(require('./routes/paidCourse'), { prefix: "/paidCourse" });
+fastify.register(require('./routes/achievement'), { prefix: "/achievement" });
+fastify.register(require('./routes/mission'), { prefix: "/mission" });
+fastify.register(require('./routes/notification'), { prefix: "/notification" });
+fastify.register(require('./routes/vocabulary'), { prefix: "/vocabulary" });
 
 // Khởi động server
 const PORT = process.env.PORT || 3000;
