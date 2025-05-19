@@ -1,14 +1,14 @@
-require('dotenv').config();
-const path = require('path');
-const fastify = require('fastify')({ logger: true });
+require("dotenv").config();
+const path = require("path");
+const fastify = require("fastify")({ logger: true });
 
 // Plugins
-const swagger = require('@fastify/swagger');
-const swaggerUI = require('@fastify/swagger-ui');
-const cors = require('@fastify/cors');
-const mongodb = require('fastify-mongodb');
-const jwt = require('@fastify/jwt');
-const fastifyStatic = require('@fastify/static');
+const swagger = require("@fastify/swagger");
+const swaggerUI = require("@fastify/swagger-ui");
+const cors = require("@fastify/cors");
+const mongodb = require("fastify-mongodb");
+const jwt = require("@fastify/jwt");
+const fastifyStatic = require("@fastify/static");
 
 // Đăng ký Swagger + Swagger UI
 fastify.register(swagger, {
@@ -16,17 +16,17 @@ fastify.register(swagger, {
     info: {
       title: "My API",
       description: "Testing the Fastify swagger integration",
-      version: "1.0.0"
+      version: "1.0.0",
     },
     consumes: ["application/json"],
-    produces: ["application/json"]
-  }
+    produces: ["application/json"],
+  },
 });
 
 fastify.register(swaggerUI, {
-  routePrefix: '/documentation',
+  routePrefix: "/documentation",
   uiConfig: {
-    docExpansion: 'none',
+    docExpansion: "none",
     deepLinking: true,
     displayRequestDuration: true,
     filter: true,
@@ -35,8 +35,12 @@ fastify.register(swaggerUI, {
     showCommonExtensions: true,
   },
   uiHooks: {
-    onRequest: (request, reply, next) => { next(); },
-    preHandler: (request, reply, next) => { next(); }
+    onRequest: (request, reply, next) => {
+      next();
+    },
+    preHandler: (request, reply, next) => {
+      next();
+    },
   },
   staticCSP: true,
   swaggerUIOptions: {
@@ -47,13 +51,13 @@ fastify.register(swaggerUI, {
       .swagger-ui .opblock { border-radius: 10px; box-shadow: 0 0 10px rgba(30, 64, 175, 0.5); }
     `,
     customSiteTitle: "My Awesome API Docs",
-    customfavIcon: "https://cdn-icons-png.flaticon.com/128/6422/6422199.png"
+    customfavIcon: "https://cdn-icons-png.flaticon.com/128/6422/6422199.png",
   },
   transformStaticCSP: (header) => header,
 });
 
 // Các plugin khác
-fastify.register(cors, { origin: '*' });
+fastify.register(cors, { origin: "*" });
 fastify.register(mongodb, {
   forceClose: true,
   url: process.env.MONGO_URL,
@@ -62,33 +66,42 @@ fastify.register(jwt, {
   secret: process.env.JWT_SECRET,
 });
 fastify.register(fastifyStatic, {
-  root: path.join(__dirname, 'uploads'),
-  prefix: '/uploads/', // Truy cập ảnh qua /uploads/...
+  root: path.join(__dirname, "uploads"),
+  prefix: "/uploads/", // Truy cập ảnh qua /uploads/...
 });
 
 // Route ví dụ cho Swagger tự động nhận diện
-fastify.get('/ping', {
-  schema: {
-    response: {
-      200: {
-        type: 'object',
-        properties: {
-          pong: { type: 'string' }
-        }
-      }
-    }
+fastify.get(
+  "/ping",
+  {
+    schema: {
+      response: {
+        200: {
+          type: "object",
+          properties: {
+            pong: { type: "string" },
+          },
+        },
+      },
+    },
+  },
+  async () => {
+    return { pong: "it works!" };
   }
-}, async () => {
-  return { pong: 'it works!' };
-});
+);
 
 // Route phục vụ Stoplight Elements
-fastify.get('/spotlight', async (request, reply) => {
-  reply.type('text/html').send(`
+fastify.get("/spotlight", async (request, reply) => {
+  reply.type("text/html").send(`
     <!DOCTYPE html>
     <html>
       <head>
         <title>Stoplight Elements</title>
+        <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/128/6422/6422199.png"/>
+        <meta property="og:title" content="Korean Learning API Docs" />
+        <meta property="og:description" content="API documentation for the Korean learning app. Try out endpoints, view schemas, and more!" />
+        <meta property="og:image" content="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" />
+        <meta name="twitter:card" content="summary_large_image" />
         <script src="https://unpkg.com/@stoplight/elements/web-components.min.js"></script>
         <link rel="stylesheet" href="https://unpkg.com/@stoplight/elements/styles.min.css">
         <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
@@ -345,8 +358,10 @@ fastify.get('/spotlight', async (request, reply) => {
           </div>
         </div>
         <div style="background:#facc15;color:#1e40af;padding:12px 20px;border-radius:8px;margin-bottom:18px;">
-          <b>Hướng dẫn:</b> Chọn API ở menu trái để xem chi tiết, thử request trực tiếp trên trình duyệt.<br>
-          Nếu cần token, hãy đăng nhập và copy token vào phần "Authorize".
+          <b>Guide:</b> Select an API from the left menu to view details and try requests directly in your browser.<br>
+          If authentication is required, please log in and paste your token into the "Authorize" section.<br>
+          You can use the search bar above to quickly find endpoints, view request/response examples, and export the OpenAPI schema.<br>
+          For more details, click on each endpoint to see parameters, request bodies, and response schemas. Try out the "Try It" feature to test APIs live!
         </div>
         <div class="elements-container">
           <elements-api
@@ -405,19 +420,54 @@ fastify.get('/spotlight', async (request, reply) => {
             setTimeout(() => toast.classList.remove('show'), 2500);
           }
         </script>
+        <div id="fab" style="position:fixed;bottom:100px;right:32px;z-index:9999;display:flex;flex-direction:column;gap:18px;">
+          <button onclick="window.open('/feedback','_blank')" title="Feedback" style="background:#facc15;color:#1e40af;border:none;border-radius:50%;width:56px;height:56px;box-shadow:0 2px 12px #0003;font-size:1.6em;cursor:pointer;">
+            <i class="fas fa-comment-dots"></i>
+          </button>
+          <button onclick="window.open('/overview','_blank')" title="App Overview" style="background:#1e40af;color:#fff;border:none;border-radius:50%;width:56px;height:56px;box-shadow:0 2px 12px #0003;font-size:1.6em;cursor:pointer;">
+            <i class="fas fa-info-circle"></i>
+          </button>
+        </div>
         <a href="/spotlight" class="back-btn"><i class="fas fa-arrow-left"></i> Back to API Docs</a>
+ 
+        <!--Start of Tawk.to Script-->
+<!--Start of Tawk.to Script-->
+<script type="text/javascript">
+var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+(function(){
+var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+s1.async=true;
+s1.src='https://embed.tawk.to/682b976e714ec01918f31299/1irl4f2fo';
+s1.charset='UTF-8';
+s1.setAttribute('crossorigin','*');
+s0.parentNode.insertBefore(s1,s0);
+})();
+</script>
+<!--End of Tawk.to Script-->
+<!--End of Tawk.to Script-->
+        s1.charset='UTF-8';
+        s1.setAttribute('crossorigin','*');
+        s0.parentNode.insertBefore(s1,s0);
+        })();
+        </script>
+        <!--End of Tawk.to Script-->
       </body>
     </html>
   `);
 });
 
 // Route giới thiệu App Học Tiếng Hàn
-fastify.get('/overview', async (request, reply) => {
-  reply.type('text/html').send(`
+fastify.get("/overview", async (request, reply) => {
+  reply.type("text/html").send(`
     <!DOCTYPE html>
     <html>
       <head>
         <title>Korean Learning App Overview</title>
+        <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/128/1055/1055685.png"/>
+        <meta property="og:title" content="Korean Learning API Docs" />
+        <meta property="og:description" content="API documentation for the Korean learning app. Try out endpoints, view schemas, and more!" />
+        <meta property="og:image" content="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" />
+        <meta name="twitter:card" content="summary_large_image" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
         <style>
           body { background: #f8fafc; margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color:rgb(64, 185, 66); }
@@ -501,86 +551,109 @@ fastify.get('/overview', async (request, reply) => {
 });
 
 // Route gửi nhận xét
-fastify.post('/feedback', {
-  schema: {
-    tags: ['Feedback'],
-    summary: 'Gửi nhận xét app',
-    description: 'Người dùng gửi nhận xét và số sao đánh giá.',
-    body: {
-      type: 'object',
-      properties: {
-        name: { type: 'string' },
-        rating: { type: 'number', minimum: 1, maximum: 5 },
-        comment: { type: 'string' },
-        role: { type: 'string', enum: ['vote'] }
-      },
-      required: ['name', 'rating', 'role']
-    },
-    response: {
-      200: {
-        type: 'object',
-        properties: { msg: { type: 'string' } }
-      }
-    }
-  }
-}, async (req, reply) => {
-  const { name, rating, comment, role } = req.body;
-  await fastify.mongo.db.collection('feedback').insertOne({
-    name, rating, comment, role, createdAt: new Date()
-  });
-  reply.send({ msg: 'Đã nhận góp ý, cảm ơn bạn!' });
-});
-
-fastify.post('/feedback/admin', {
-  schema: {
-    tags: ['Feedback'],
-    summary: 'Xem thống kê nhận xét (quản trị)',
-    description: 'Quản trị viên nhập mật khẩu để xem thống kê và tất cả nhận xét.',
-    body: {
-      type: 'object',
-      properties: { password: { type: 'string' } },
-      required: ['password']
-    },
-    response: {
-      200: {
-        type: 'object',
+fastify.post(
+  "/feedback",
+  {
+    schema: {
+      tags: ["Feedback"],
+      summary: "Gửi nhận xét app",
+      description: "Người dùng gửi nhận xét và số sao đánh giá.",
+      body: {
+        type: "object",
         properties: {
-          avg: { type: 'number' },
-          count: { type: 'number' },
-          feedbacks: {
-            type: 'array',
-            items: {
-              type: 'object',
-              properties: {
-                name: { type: 'string' },
-                rating: { type: 'number' },
-                comment: { type: 'string' },
-                createdAt: { type: 'string' }
-              }
-            }
-          }
-        }
-      }
-    }
+          name: { type: "string" },
+          rating: { type: "number", minimum: 1, maximum: 5 },
+          comment: { type: "string" },
+          role: { type: "string", enum: ["vote"] },
+        },
+        required: ["name", "rating", "role"],
+      },
+      response: {
+        200: {
+          type: "object",
+          properties: { msg: { type: "string" } },
+        },
+      },
+    },
+  },
+  async (req, reply) => {
+    const { name, rating, comment, role } = req.body;
+    await fastify.mongo.db.collection("feedback").insertOne({
+      name,
+      rating,
+      comment,
+      role,
+      createdAt: new Date(),
+    });
+    reply.send({ msg: "Đã nhận góp ý, cảm ơn bạn!" });
   }
-}, async (req, reply) => {
-  const { password } = req.body;
-  if (password !== process.env.FEEDBACK_ADMIN_PASSWORD) {
-    return reply.code(401).send({ msg: 'Sai mật khẩu!' });
-  }
-  const feedbacks = await fastify.mongo.db.collection('feedback').find({ role: 'vote' }).toArray();
-  const count = feedbacks.length;
-  const avg = count ? (feedbacks.reduce((a, b) => a + b.rating, 0) / count).toFixed(2) : 0;
-  reply.send({ avg, count, feedbacks });
-});
+);
 
-fastify.get('/feedback', async (request, reply) => {
-  reply.type('text/html').send(`
+fastify.post(
+  "/feedback/admin",
+  {
+    schema: {
+      tags: ["Feedback"],
+      summary: "Xem thống kê nhận xét (quản trị)",
+      description:
+        "Quản trị viên nhập mật khẩu để xem thống kê và tất cả nhận xét.",
+      body: {
+        type: "object",
+        properties: { password: { type: "string" } },
+        required: ["password"],
+      },
+      response: {
+        200: {
+          type: "object",
+          properties: {
+            avg: { type: "number" },
+            count: { type: "number" },
+            feedbacks: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  name: { type: "string" },
+                  rating: { type: "number" },
+                  comment: { type: "string" },
+                  createdAt: { type: "string" },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+  async (req, reply) => {
+    const { password } = req.body;
+    if (password !== process.env.FEEDBACK_ADMIN_PASSWORD) {
+      return reply.code(401).send({ msg: "Sai mật khẩu!" });
+    }
+    const feedbacks = await fastify.mongo.db
+      .collection("feedback")
+      .find({ role: "vote" })
+      .toArray();
+    const count = feedbacks.length;
+    const avg = count
+      ? (feedbacks.reduce((a, b) => a + b.rating, 0) / count).toFixed(2)
+      : 0;
+    reply.send({ avg, count, feedbacks });
+  }
+);
+
+fastify.get("/feedback", async (request, reply) => {
+  reply.type("text/html").send(`
     <!DOCTYPE html>
     <html>
       <head>
         <title>Góp ý & Đánh giá App</title>
         <meta charset="utf-8"/>
+        <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/128/6422/6422199.png"/>
+        <meta property="og:title" content="Korean Learning API Docs" />
+        <meta property="og:description" content="API documentation for the Korean learning app. Try out endpoints, view schemas, and more!" />
+        <meta property="og:image" content="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" />
+        <meta name="twitter:card" content="summary_large_image" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
         <style>
           body { background: #f8fafc; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; }
@@ -695,13 +768,18 @@ fastify.get('/feedback', async (request, reply) => {
   `);
 });
 
-fastify.get('/feedback/admin', async (request, reply) => {
-  reply.type('text/html').send(`
+fastify.get("/feedback/admin", async (request, reply) => {
+  reply.type("text/html").send(`
     <!DOCTYPE html>
     <html>
       <head>
         <title>Quản trị nhận xét App</title>
         <meta charset="utf-8"/>
+        <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/128/6422/6422199.png"/>
+        <meta property="og:title" content="Korean Learning API Docs" />
+        <meta property="og:description" content="API documentation for the Korean learning app. Try out endpoints, view schemas, and more!" />
+        <meta property="og:image" content="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" />
+        <meta name="twitter:card" content="summary_large_image" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
         <style>
           body { background: #f8fafc; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; }
@@ -767,12 +845,14 @@ fastify.get('/feedback/admin', async (request, reply) => {
 });
 
 // Đăng ký các route riêng
-fastify.register(require('./routes/User'), { prefix: '/auth' });
+fastify.register(require("./routes/User"), { prefix: "/auth" });
 
 // Khởi động server
 const PORT = process.env.PORT || 3000;
-fastify.listen({ port: PORT, host: '0.0.0.0' }, (err) => {
+fastify.listen({ port: PORT, host: "0.0.0.0" }, (err) => {
   if (err) throw err;
   console.log(`🚀 Server running at http://localhost:${PORT}`);
-  console.log(`📄 Swagger UI available at http://localhost:${PORT}/documentation`);
+  console.log(
+    `📄 Swagger UI available at http://localhost:${PORT}/documentation`
+  );
 });
