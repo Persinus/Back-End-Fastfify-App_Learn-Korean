@@ -771,9 +771,8 @@ fastify.register(require('./routes/User'), { prefix: '/auth' });
 
 // Khởi động server
 const PORT = process.env.PORT || 3000;
-fastify.listen({ port: PORT }, (err) => {
+fastify.listen({ port: PORT, host: '0.0.0.0' }, (err) => {
   if (err) throw err;
   console.log(`🚀 Server running at http://localhost:${PORT}`);
   console.log(`📄 Swagger UI available at http://localhost:${PORT}/documentation`);
-
 });

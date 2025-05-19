@@ -4,8 +4,3 @@
 # Ignore node_modules
 node_modules/
 
-# Ignore lock files
-package-lock.json
-
-# Ignore package.json if needed
-package.json
