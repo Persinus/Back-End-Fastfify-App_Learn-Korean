@@ -58,107 +58,7 @@ const claimAchievementSchema = {
 };
 
 // --- Lesson Schemas ---
-const createLessonSchema = {
-  body: {
-    type: 'object',
-    required: ['lessonId', 'title', 'description', 'category', 'level', 'content', 'exercises', 'isPremium'],
-    properties: {
-      lessonId: { type: 'string' },
-      title: { type: 'string' },
-      description: { type: 'string' },
-      category: { type: 'string' },
-      level: { type: 'number' },
-      content: { type: 'array', items: { type: 'string' } },
-      exercises: { type: 'array', items: { type: 'string' } },
-      isPremium: { type: 'boolean' },
-    },
-  },
-  response: {
-    200: {
-      type: 'object',
-      properties: {
-        msg: { type: 'string' },
-      },
-    },
-  },
-};
 
-const getLessonsSchema = {
-  response: {
-    200: {
-      type: 'array',
-      items: {
-        type: 'object',
-        properties: {
-          lessonId: { type: 'string' },
-          title: { type: 'string' },
-          description: { type: 'string' },
-          category: { type: 'string' },
-          level: { type: 'number' },
-          content: { type: 'array', items: { type: 'string' } },
-          exercises: { type: 'array', items: { type: 'string' } },
-          isPremium: { type: 'boolean' },
-          point: { type: 'number' }, // Thêm điểm từng bài nếu cần
-        },
-      },
-    },
-  },
-};
-
-const getLessonByIdSchema = {
-  params: {
-    type: 'object',
-    properties: {
-      lessonId: { type: 'string' },
-    },
-  },
-  response: {
-    200: {
-      type: 'object',
-      properties: {
-        lessonId: { type: 'string' },
-        title: { type: 'string' },
-        description: { type: 'string' },
-        category: { type: 'string' },
-        level: { type: 'number' },
-        content: { type: 'array', items: { type: 'string' } },
-        exercises: { type: 'array', items: { type: 'string' } },
-        isPremium: { type: 'boolean' },
-        point: { type: 'number' }, // Thêm điểm nếu cần
-      },
-    },
-  },
-};
-
-const updateLessonSchema = {
-  params: {
-    type: 'object',
-    properties: {
-      lessonId: { type: 'string' },
-    },
-  },
-  body: {
-    type: 'object',
-    properties: {
-      title: { type: 'string' },
-      description: { type: 'string' },
-      category: { type: 'string' },
-      level: { type: 'number' },
-      content: { type: 'array', items: { type: 'string' } },
-      exercises: { type: 'array', items: { type: 'string' } },
-      isPremium: { type: 'boolean' },
-    },
-  },
-};
-
-const deleteLessonSchema = {
-  params: {
-    type: 'object',
-    properties: {
-      lessonId: { type: 'string' },
-    },
-  },
-};
 
 // --- Daily Mission Schemas ---
 const getDailyMissionsSchema = {
@@ -398,13 +298,13 @@ const searchVocabularySchema = {
 const registerSchema = {
   body: {
     type: 'object',
+    required: ['id', 'title', 'description', 'price'],
     properties: {
-      username: { type: 'string' },
-      password: { type: 'string' },
-      email: { type: 'string', format: 'email' },
-      avatarUrl: { type: 'string', format: 'uri', nullable: true }
-    },
-    required: ['username', 'password', 'email']
+      id: { type: 'string' },
+      title: { type: 'string' },
+      description: { type: 'string' },
+      price: { type: 'number' }
+    }
   },
   response: {
     200: {
@@ -494,7 +394,8 @@ const getProfileSchema = {
             score: { type: 'number' },
             gold: { type: 'number' },
             diamond: { type: 'number' },
-            lessons: { type: 'array', items: { type: 'object' } },
+            freeCourses: { type: 'array', items: { type: 'object' } },   // đổi từ lessons
+            paidCourses: { type: 'array', items: { type: 'object' } },   // thêm mới
             achievements: { type: 'array', items: { type: 'object' } },
             dailyMissions: { type: 'array', items: { type: 'object' } },
             // ... thêm các trường khác nếu cần
@@ -511,12 +412,7 @@ module.exports = {
   getAchievementsSchema,
   getUserAchievementsSchema,
   claimAchievementSchema,
-  // Lesson
-  createLessonSchema,
-  getLessonsSchema,
-  getLessonByIdSchema,
-  updateLessonSchema,
-  deleteLessonSchema,
+ 
   // Daily Mission
   getDailyMissionsSchema,
   completeMissionSchema,
