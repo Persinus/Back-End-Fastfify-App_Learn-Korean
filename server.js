@@ -61,11 +61,11 @@ fastify.register(require('./routes/freeCourse'), { prefix: "/freeCourse" });
 fastify.register(require('./routes/paidCourse'), { prefix: "/paidCourse" });
 fastify.register(require('./routes/achievement'), { prefix: "/achievement" });
 fastify.register(require('./routes/mission'), { prefix: "/mission" });
-fastify.register(require('./routes/notification'), { prefix: "/notification" });
 fastify.register(require('./routes/vocabulary'), { prefix: "/vocabulary" });
 fastify.register(require('./routes/feedbackPage'));
 fastify.register(require('./routes/Overview'));
 fastify.register(require('./routes/stoplightPage'));
+fastify.register(require('./routes/RealtimeSocket'));
 
 // Khởi động server
 const PORT = process.env.PORT || 3000;
