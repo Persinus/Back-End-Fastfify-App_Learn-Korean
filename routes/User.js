@@ -6,7 +6,7 @@ const {
   registerSchema,
   loginSchema,
   getProfileSchema,
-  claimAchievementSchema 
+  
 } = require('../Schema/User');
 
 module.exports = fp(async function (fastify, opts) {
@@ -17,8 +17,7 @@ module.exports = fp(async function (fastify, opts) {
   const freeCoursesCollection = fastify.mongo.db.collection('freeCourses');
   const paidCoursesCollection = fastify.mongo.db.collection('paidCourses');
 
-  // Đăng ký
-  fastify.post('/register', {
+ fastify.post('/register', {
     schema: {
       ...registerSchema,
       tags: ['Người dùng'],
@@ -73,13 +72,14 @@ module.exports = fp(async function (fastify, opts) {
       fullName: '',
       birthday: '',
       gender: '',
-      notifications: [],
+ 
       freeCourses: [],
       paidCourses: [],
     };
     await usersCollection.insertOne(newUser);
     reply.send({ msg: 'Registration successful' });
   });
+
 
   // Đăng nhập
   fastify.post('/login', {
@@ -219,146 +219,7 @@ module.exports = fp(async function (fastify, opts) {
     reply.send({ msg: 'Personal info updated' });
   });
 
-  // Cập nhật điểm số, vàng, kim cương
-  fastify.put('/users/:username/stats', {
-    schema: {
-      tags: ['Người dùng'],
-      summary: 'Cập nhật điểm số, vàng, kim cương',
-      body: {
-        type: 'object',
-        properties: {
-          score: { type: 'number' },
-          gold: { type: 'number' },
-          diamond: { type: 'number' }
-        }
-      },
-      params: {
-        type: 'object',
-        properties: { username: { type: 'string' } },
-        required: ['username']
-      },
-      response: {
-        200: { type: 'object', properties: { msg: { type: 'string' } } }
-      }
-    }
-  }, async (req, reply) => {
-    const { username } = req.params;
-    const updates = req.body;
-    await usersCollection.updateOne({ username }, { $set: updates });
-    reply.send({ msg: 'Stats updated' });
-  });
-
-  // Đánh dấu thông báo đã đọc
-  fastify.put('/users/:username/notifications/read', {
-    schema: {
-      tags: ['Người dùng'],
-      summary: 'Đánh dấu thông báo đã đọc',
-      body: {
-        type: 'object',
-        properties: { notificationId: { type: 'string' } },
-        required: ['notificationId']
-      },
-      params: {
-        type: 'object',
-        properties: { username: { type: 'string' } },
-        required: ['username']
-      },
-      response: {
-        200: { type: 'object', properties: { msg: { type: 'string' } } }
-      }
-    }
-  }, async (req, reply) => {
-    const { username } = req.params;
-    const { notificationId } = req.body;
-    await usersCollection.updateOne(
-      { username },
-      { $pull: { notifications: notificationId } }
-    );
-    reply.send({ msg: 'Notification marked as read' });
-  });
-
-  fastify.put('/users/:username/notifications/:notificationId/read', {
-    schema: {
-      tags: ['Người dùng'],
-      summary: 'Đánh dấu thông báo đã đọc',
-      params: {
-        type: 'object',
-        properties: {
-          username: { type: 'string' },
-          notificationId: { type: 'string' }
-        },
-        required: ['username', 'notificationId']
-      },
-      response: {
-        200: { type: 'object', properties: { msg: { type: 'string' } } }
-      }
-    }
-  }, async (req, reply) => {
-    const { username, notificationId } = req.params;
-    await usersCollection.updateOne(
-      { username, 'notifications.notificationId': notificationId },
-      { $set: { 'notifications.$.isRead': true } }
-    );
-    reply.send({ msg: 'Notification marked as read' });
-  });
-
-  // Hoàn thành daily mission
-  fastify.put('/users/:username/daily-missions/complete', {
-    schema: {
-      tags: ['Người dùng'],
-      summary: 'Hoàn thành daily mission',
-      body: {
-        type: 'object',
-        properties: { missionId: { type: 'string' } },
-        required: ['missionId']
-      },
-      params: {
-        type: 'object',
-        properties: { username: { type: 'string' } },
-        required: ['username']
-      },
-      response: {
-        200: { type: 'object', properties: { msg: { type: 'string' } } }
-      }
-    }
-  }, async (req, reply) => {
-    const { username } = req.params;
-    const { missionId } = req.body;
-    await usersCollection.updateOne(
-      { username, "dailyMissions.missionId": missionId },
-      { $set: { "dailyMissions.$.isCompleted": true } }
-    );
-    reply.send({ msg: 'Daily mission completed' });
-  });
-
-  // Hoàn thành mission và nhận vàng
-  fastify.put('/users/:username/daily-missions/:missionId/complete', {
-    schema: {
-      tags: ['Người dùng'],
-      summary: 'Hoàn thành mission và nhận vàng',
-      params: {
-        type: 'object',
-        properties: {
-          username: { type: 'string' },
-          missionId: { type: 'string' }
-        },
-        required: ['username', 'missionId']
-      },
-      response: {
-        200: { type: 'object', properties: { msg: { type: 'string' } } }
-      }
-    }
-  }, async (req, reply) => {
-    const { username, missionId } = req.params;
-    await usersCollection.updateOne(
-      { username, 'dailyMissions.missionId': missionId },
-      {
-        $set: { 'dailyMissions.$.isCompleted': true, 'dailyMissions.$.isClaimed': true },
-        $inc: { gold: 50 }
-      }
-    );
-    reply.send({ msg: 'Mission completed and gold rewarded' });
-  });
+  
 
   // Tăng daily streak
   fastify.put('/users/:username/daily-streak', {
@@ -505,5 +366,121 @@ module.exports = fp(async function (fastify, opts) {
     reply.send(result);
   });
 
+  // Gửi lời mời kết bạn
+  fastify.post('/users/:username/friend-request', {
+    schema: {
+      tags: ['Người dùng'],
+      summary: 'Gửi lời mời kết bạn',
+      description: 'API này cho phép user gửi lời mời kết bạn tới user khác theo username.',
+      params: {
+        type: 'object',
+        properties: { username: { type: 'string' } }, // người nhận
+        required: ['username']
+      },
+      body: {
+        type: 'object',
+        properties: { from: { type: 'string' } }, // người gửi
+        required: ['from']
+      },
+      response: {
+        200: { type: 'object', properties: { msg: { type: 'string' } } }
+      }
+    }
+  }, async (req, reply) => {
+    const { username } = req.params; // người nhận
+    const { from } = req.body;       // người gửi
+
+    if (username === from) return reply.code(400).send({ msg: 'Cannot send friend request to yourself' });
+
+    // Kiểm tra đã là bạn bè chưa
+    const user = await usersCollection.findOne({ username });
+    if (user.friends && user.friends.includes(from)) {
+      return reply.code(400).send({ msg: 'Already friends' });
+    }
+    // Kiểm tra đã có lời mời chưa
+    if (user.friendRequests && user.friendRequests.find(r => r.from === from && r.status === 'pending')) {
+      return reply.code(400).send({ msg: 'Friend request already sent' });
+    }
+
+    await usersCollection.updateOne(
+      { username },
+      { $push: { friendRequests: { from, status: 'pending' } } }
+    );
+    reply.send({ msg: 'Friend request sent' });
+  });
+
+  // Duyệt lời mời kết bạn
+  fastify.post('/users/:username/friend-request/respond', {
+    schema: {
+      tags: ['Người dùng'],
+      summary: 'Duyệt lời mời kết bạn',
+      description: 'API này cho phép user chấp nhận hoặc từ chối lời mời kết bạn.',
+      params: {
+        type: 'object',
+        properties: { username: { type: 'string' } }, // người nhận
+        required: ['username']
+      },
+      body: {
+        type: 'object',
+        properties: {
+          from: { type: 'string' }, // người gửi lời mời
+          accept: { type: 'boolean' }
+        },
+        required: ['from', 'accept']
+      },
+      response: {
+        200: { type: 'object', properties: { msg: { type: 'string' } } }
+      }
+    }
+  }, async (req, reply) => {
+    const { username } = req.params; // người nhận
+    const { from, accept } = req.body;
+
+    // Cập nhật trạng thái lời mời
+    await usersCollection.updateOne(
+      { username, "friendRequests.from": from, "friendRequests.status": "pending" },
+      { $set: { "friendRequests.$.status": accept ? "accepted" : "rejected" } }
+    );
+
+    if (accept) {
+      // Thêm bạn bè cho cả hai user
+      await usersCollection.updateOne(
+        { username },
+        { $addToSet: { friends: from } }
+      );
+      await usersCollection.updateOne(
+        { username: from },
+        { $addToSet: { friends: username } }
+      );
+    }
+
+    reply.send({ msg: accept ? 'Friend request accepted' : 'Friend request rejected' });
+  });
+
+  // Lấy danh sách bạn bè
+  fastify.get('/users/:username/friends', {
+    schema: {
+      tags: ['Người dùng'],
+      summary: 'Lấy danh sách bạn bè',
+      description: 'API này trả về danh sách username bạn bè của user.',
+      params: {
+        type: 'object',
+        properties: { username: { type: 'string' } },
+        required: ['username']
+      },
+      response: {
+        200: {
+          type: 'object',
+          properties: {
+            friends: { type: 'array', items: { type: 'string' } }
+          }
+        }
+      }
+    }
+  }, async (req, reply) => {
+    const { username } = req.params;
+    const user = await usersCollection.findOne({ username });
+    reply.send({ friends: user.friends || [] });
+  });
   
 });
