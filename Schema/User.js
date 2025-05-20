@@ -51,9 +51,21 @@ const getProfileSchema = {
             username: { type: 'string' },
             email: { type: 'string' },
             avatar: { type: 'string' },
-            score: { type: 'number' }, // đổi từ score sang score
+            score: { type: 'number' },
             gold: { type: 'number' },
             diamond: { type: 'number' },
+            friends: { type: 'array', items: { type: 'string' } }, // danh sách bạn bè đã xác nhận
+            friendRequests: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  from: { type: 'string' }, // username người gửi
+                  status: { type: 'string', enum: ['pending', 'accepted', 'rejected'] }
+                },
+                required: ['from', 'status']
+              }
+            },
             freeCourses: { type: 'array', items: { type: 'object' } },
             paidCourses: { type: 'array', items: { type: 'object' } },
             achievements: { type: 'array', items: { type: 'object' } },
@@ -72,7 +84,7 @@ const updateProfileSchema = {
     properties: {
       email: { type: 'string', format: 'email', nullable: true },
       avatar: { type: 'string', format: 'uri', nullable: true },
-      score: { type: 'number', nullable: true }, // đổi từ score sang score
+      score: { type: 'number', nullable: true },
       gold: { type: 'number', nullable: true },
       diamond: { type: 'number', nullable: true }
     },
@@ -136,7 +148,7 @@ const getAllUsersSchema = {
           username: { type: 'string' },
           email: { type: 'string' },
           avatar: { type: 'string' },
-          score: { type: 'number' }, // đổi từ score sang score
+          score: { type: 'number' },
           gold: { type: 'number' },
           diamond: { type: 'number' }
         }
@@ -167,7 +179,7 @@ const updateStatsSchema = {
   body: {
     type: 'object',
     properties: {
-      score: { type: 'number' }, // đổi từ score sang score
+      score: { type: 'number' },
       gold: { type: 'number' },
       diamond: { type: 'number' }
     },
@@ -234,7 +246,97 @@ const markNotificationReadSchema = {
   }
 };
 
+// --- Friend Request Schema ---
+const friendRequestSchema = {
+  body: {
+    type: 'object',
+    properties: {
+      from: { type: 'string' },
+      to: { type: 'string' }
+    },
+    required: ['from', 'to']
+  },
+  response: {
+    200: {
+      type: 'object',
+      properties: { msg: { type: 'string' } }
+    }
+  }
+};
+
+// --- Accept/Reject Friend Request Schema ---
+const respondFriendRequestSchema = {
+  body: {
+    type: 'object',
+    properties: {
+      requestId: { type: 'string' },
+      accept: { type: 'boolean' }
+    },
+    required: ['requestId', 'accept']
+  },
+  response: {
+    200: {
+      type: 'object',
+      properties: { msg: { type: 'string' } }
+    }
+  }
+};
+
+// --- Send Message Schema ---
+const sendMessageSchema = {
+  body: {
+    type: 'object',
+    properties: {
+      from: { type: 'string' },
+      to: { type: 'string' },
+      content: { type: 'string' }
+    },
+    required: ['from', 'to', 'content']
+  },
+  response: {
+    200: {
+      type: 'object',
+      properties: { msg: { type: 'string' }, messageId: { type: 'string' } }
+    }
+  }
+};
+
+// --- Get Conversation Schema ---
+const getConversationSchema = {
+  querystring: {
+    type: 'object',
+    properties: {
+      user1: { type: 'string' },
+      user2: { type: 'string' }
+    },
+    required: ['user1', 'user2']
+  },
+  response: {
+    200: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          from: { type: 'string' },
+          to: { type: 'string' },
+          content: { type: 'string' },
+          timestamp: { type: 'string', format: 'date-time' }
+        }
+      }
+    }
+  }
+};
+
+// Khi tạo user mới, thêm mặc định:
+const newUser = {
+  // ...other fields...
+  friends: [],
+  friendRequests: [],
+  // ...
+};
+
 module.exports = {
+  newUser,
   registerSchema,
   loginSchema,
   getProfileSchema,
@@ -246,5 +348,9 @@ module.exports = {
   updateStatsSchema,
   completeDailyMissionSchema,
   updatePersonalInfoSchema,
-  markNotificationReadSchema
+  markNotificationReadSchema,
+  friendRequestSchema,
+  respondFriendRequestSchema,
+  sendMessageSchema,
+  getConversationSchema
 };
