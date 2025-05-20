@@ -1,0 +1,71 @@
+<!-- test-realtime-chat.html -->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Realtime Chat Test</title>
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+</head>
+<body>
+  <h2>Realtime Chat Test</h2>
+  <div>
+    <label>Username: <input id="username" /></label>
+    <button onclick="register()">Login</button>
+  </div>
+  <div id="online-users"></div>
+  <div id="chat" style="display:none;">
+    <h3>Chat with: <span id="chatWith"></span></h3>
+    <div id="messages" style="border:1px solid #ccc; height:200px; overflow:auto; margin-bottom:8px;"></div>
+    <input id="msg" placeholder="Type a message..." />
+    <button onclick="sendMsg()">Send</button>
+  </div>
+  <script>
+    const socket = io('http://localhost:3000'); // Đổi port nếu backend khác 3000
+    let myUsername = '';
+    let chatTo = '';
+
+    function register() {
+      myUsername = document.getElementById('username').value.trim();
+      if (!myUsername) return alert('Enter your username!');
+      socket.emit('register', myUsername);
+    }
+
+    socket.on('online-users', (users) => {
+      const list = users.filter(u => u !== myUsername)
+        .map(u => `<button onclick="startChat('${u}')">${u}</button>`).join(' ');
+      document.getElementById('online-users').innerHTML = 'Online: ' + list;
+    });
+
+    function startChat(username) {
+      chatTo = username;
+      document.getElementById('chatWith').innerText = username;
+      document.getElementById('chat').style.display = 'block';
+      document.getElementById('messages').innerHTML = '';
+      // Yêu cầu lịch sử tin nhắn
+      socket.emit('get-history', { user1: myUsername, user2: chatTo });
+    }
+
+    socket.on('history', (history) => {
+      document.getElementById('messages').innerHTML = '';
+      history.forEach(addMsg);
+    });
+
+    function sendMsg() {
+      const content = document.getElementById('msg').value;
+      if (!chatTo || !content) return;
+      socket.emit('private-message', { from: myUsername, to: chatTo, content });
+      addMsg({ from: myUsername, content, timestamp: new Date() });
+      document.getElementById('msg').value = '';
+    }
+
+    socket.on('private-message', (msg) => {
+      addMsg(msg);
+    });
+
+    function addMsg(msg) {
+      const div = document.createElement('div');
+      div.textContent = `[${msg.from}] ${msg.content}`;
+      document.getElementById('messages').appendChild(div);
+    }
+  </script>
+</body>
+</html>
