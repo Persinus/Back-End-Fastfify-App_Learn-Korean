@@ -344,7 +344,7 @@ module.exports = fp(async function (fastify, opts) {
               fullName: { type: 'string' },
               birthday: { type: 'string', format: 'date' },
               gender: { type: 'string', enum: ['male', 'female', 'other'] },
-              scorescore: { type: 'number' },
+              score: { type: 'number' },
             }
           }
         }
