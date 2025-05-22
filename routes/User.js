@@ -189,34 +189,7 @@ module.exports = fp(async function (fastify, opts) {
     reply.send({ msg: 'Avatar updated', avatar });
   });
 
-  // Cập nhật thông tin cá nhân nâng cao
-  fastify.put('/users/:username/personal', {
-    schema: {
-      tags: ['Người dùng'],
-      summary: 'Cập nhật thông tin cá nhân nâng cao',
-      body: {
-        type: 'object',
-        properties: {
-          fullName: { type: 'string' },
-          birthday: { type: 'string', format: 'date' },
-          gender: { type: 'string', enum: ['male', 'female', 'other'] }
-        }
-      },
-      params: {
-        type: 'object',
-        properties: { username: { type: 'string' } },
-        required: ['username']
-      },
-      response: {
-        200: { type: 'object', properties: { msg: { type: 'string' } } }
-      }
-    }
-  }, async (req, reply) => {
-    const { username } = req.params;
-    const updates = req.body;
-    await usersCollection.updateOne({ username }, { $set: updates });
-    reply.send({ msg: 'Personal info updated' });
-  });
+  
 
   
 
@@ -548,6 +521,99 @@ module.exports = fp(async function (fastify, opts) {
     // Lấy các lời mời kết bạn đang chờ duyệt
     const requests = (user.friendRequests || []).filter(r => r.status === 'pending');
     reply.send({ requests });
+  });
+
+  // Tăng gold cho user
+  fastify.post('/users/:username/add-gold', {
+    schema: {
+      tags: ['Người dùng'],
+      summary: 'Tăng gold cho user',
+      params: {
+        type: 'object',
+        properties: { username: { type: 'string' } },
+        required: ['username']
+      },
+      body: {
+        type: 'object',
+        properties: { amount: { type: 'number', minimum: 1 } },
+        required: ['amount']
+      },
+      response: {
+        200: { type: 'object', properties: { msg: { type: 'string' }, gold: { type: 'number' } } }
+      }
+    }
+  }, async (req, reply) => {
+    const { username } = req.params;
+    const { amount } = req.body;
+    const user = await usersCollection.findOneAndUpdate(
+      { username },
+      { $inc: { gold: amount } },
+      { returnDocument: 'after' }
+    );
+    if (!user.value) return reply.code(404).send({ msg: 'User not found' });
+    reply.send({ msg: 'Gold added', gold: user.value.gold });
+  });
+
+  // Tăng diamond cho user
+  fastify.post('/users/:username/add-diamond', {
+    schema: {
+      tags: ['Người dùng'],
+      summary: 'Tăng diamond cho user',
+      params: {
+        type: 'object',
+        properties: { username: { type: 'string' } },
+        required: ['username']
+      },
+      body: {
+        type: 'object',
+        properties: { amount: { type: 'number', minimum: 1 } },
+        required: ['amount']
+      },
+      response: {
+        200: { type: 'object', properties: { msg: { type: 'string' }, diamond: { type: 'number' } } }
+      }
+    }
+  }, async (req, reply) => {
+    const { username } = req.params;
+    const { amount } = req.body;
+    const user = await usersCollection.findOneAndUpdate(
+      { username },
+      { $inc: { diamond: amount } },
+      { returnDocument: 'after' }
+    );
+    if (!user.value) return reply.code(404).send({ msg: 'User not found' });
+    reply.send({ msg: 'Diamond added', diamond: user.value.diamond });
+  });
+
+  // Tăng score cho user
+  fastify.post('/users/:username/add-score', {
+    schema: {
+      tags: ['Người dùng'],
+      summary: 'Tăng score cho user',
+      params: {
+        type: 'object',
+        properties: { username: { type: 'string' } },
+        required: ['username']
+      },
+      body: {
+        type: 'object',
+        properties: { amount: { type: 'number', minimum: 1 } },
+        required: ['amount']
+      },
+      response: {
+        200: { type: 'object', properties: { msg: { type: 'string' }, score: { type: 'number' } } }
+      }
+    }
+  }, async (req, reply) => {
+    const { username } = req.params;
+    const { amount } = req.body;
+    const user = await usersCollection.findOneAndUpdate(
+      { username },
+      { $inc: { score: amount } },
+      { returnDocument: 'after' }
+    );
+    if (!user.value) return reply.code(404).send({ msg: 'User not found' });
+    reply.send({ msg: 'Score added', score: user.value.score });
   });
   
 });

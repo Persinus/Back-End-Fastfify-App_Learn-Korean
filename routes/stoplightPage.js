@@ -239,6 +239,7 @@ module.exports = fp(async function (fastify, opts) {
                   <div>Persinus & Phan Duc Tho</div>
                   <div class="role">Frontend</div>
                   <div class="socials">
+                    <a href="https://www.figma.com/design/GuXuRO9XP7O7FR7272SyTE/Untitled?node-id=0-1&p=f&t=6HUx5ueD7MYJrQaJ-01" target="_blank" title="Figma"><i class="fab fa-figma"></i></a> 
                     <a href="https://github.com/Persinus/App_Learn_KOREAN_EXPO_ReactNative" target="_blank"  title="Project Repo"><i class="fas fa-code"></i></a>
                   </div>
                 </div>
@@ -254,11 +255,11 @@ module.exports = fp(async function (fastify, opts) {
               </div>
             </div>
             <div class="qr-list">
-              <div class="qr-item" onclick="window.open('https://your-frontend-link.com','_blank')">
+              <div class="qr-item" onclick="window.open('https://github.com/Persinus/App_Learn_KOREAN_EXPO_ReactNative,'_blank')">
                 <canvas id="qr-fe" class="qr-canvas"></canvas>
                 <span class="qr-label"><i class="fas fa-globe"></i> FE QR</span>
               </div>
-              <div class="qr-item" onclick="window.open('https://www.figma.com/file/your-figma-id','_blank')">
+              <div class="qr-item" onclick="window.open('https://www.figma.com/design/GuXuRO9XP7O7FR7272SyTE/Untitled?node-id=0-1&p=f&t=6HUx5ueD7MYJrQaJ-0','_blank')">
                 <canvas id="qr-figma" class="qr-canvas"></canvas>
                 <span class="qr-label"><i class="fab fa-figma"></i> Figma QR</span>
               </div>
@@ -268,12 +269,7 @@ module.exports = fp(async function (fastify, opts) {
               </div>
             </div>
           </div>
-          <div style="background:#facc15;color:#1e40af;padding:12px 20px;border-radius:8px;margin-bottom:18px;">
-            <b>Guide:</b> Select an API from the left menu to view details and try requests directly in your browser.<br>
-            If authentication is required, please log in and paste your token into the "Authorize" section.<br>
-            You can use the search bar above to quickly find endpoints, view request/response examples, and export the OpenAPI schema.<br>
-            For more details, click on each endpoint to see parameters, request bodies, and response schemas. Try out the "Try It" feature to test APIs live!
-          </div>
+      
           <div class="elements-container">
             <elements-api
               apiDescriptionUrl="/documentation/json"
@@ -287,7 +283,7 @@ module.exports = fp(async function (fastify, opts) {
             // QR code hiệu ứng
             new QRious({
               element: document.getElementById('qr-fe'),
-              value: 'https://your-frontend-link.com',
+              value: 'https://github.com/Persinus/App_Learn_KOREAN_EXPO_ReactNative',
               size: 70,
               background: '#fff',
               foreground: '#1e40af',
@@ -295,7 +291,7 @@ module.exports = fp(async function (fastify, opts) {
             });
             new QRious({
               element: document.getElementById('qr-figma'),
-              value: 'https://www.figma.com/file/your-figma-id',
+              value: 'https://www.figma.com/design/GuXuRO9XP7O7FR7272SyTE/Untitled?node-id=0-1&p=f&t=6HUx5ueD7MYJrQaJ-0',
               size: 70,
               background: '#fff',
               foreground: '#1e40af',
