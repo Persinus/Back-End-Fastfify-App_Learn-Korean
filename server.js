@@ -66,6 +66,7 @@ fastify.register(require('./routes/feedbackPage'));
 fastify.register(require('./routes/Overview'));
 fastify.register(require('./routes/stoplightPage'));
 fastify.register(require('./routes/RealtimeSocket'));
+fastify.register(require('./routes/giftcode'));
 
 // Khởi động server
 const PORT = process.env.PORT || 3000;
